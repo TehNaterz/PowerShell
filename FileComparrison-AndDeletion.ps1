@@ -1,4 +1,4 @@
-﻿### FileComparrison-AndDeltion V1.0 by Nathan Crist - https://natesitnet.wordpress.com/
+﻿### FileComparrison-AndDeletion V1.0 by Nathan Crist - https://natesitnet.wordpress.com/
 ### This script is used for comparing files in 2 directoriess.
 ### It generates an SHA1 hash of each file in both directories for comparrison
 ### It will Output to a CSV in the directory the script is executed from
