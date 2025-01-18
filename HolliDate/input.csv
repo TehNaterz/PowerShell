@@ -1,0 +1,9 @@
+Holiday,Type,Ordinal,Weekday,Month,Day
+New Year’s Day,Fixed,,,1,1
+Martin Luther King Jr. Day,Variable,3,Monday,1,
+Independence Day,Fixed,,,7,4
+Thanksgiving Day,Variable,4,Thursday,11,
+Christmas Day,Fixed,,,12,25
+Christmas Eve,Fixed,,,12,24
+Memorial Day,Variable,Last,Monday,5,
+Labor Day,Variable,1,Monday,9,
