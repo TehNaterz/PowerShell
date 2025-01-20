@@ -65,7 +65,7 @@ else{
     }
     $dictIndex | Export-Clixml $indextDictonary
 }
-
+$randyList = @()
 $outputList = @()
 $fullrunTimer = [System.Diagnostics.Stopwatch]::StartNew()
 while($runCount -gt 0){
@@ -79,6 +79,7 @@ while($runCount -gt 0){
         $word = $null
         $randy = 999999
         $randy = getaRando
+        $randyList += $randy
         ####### mathTime #############################################################################################################################
         #
         #
@@ -87,7 +88,7 @@ while($runCount -gt 0){
         #
         #
         [int]$max = 999999
-        [int]$min = 100000
+        [int]$min = 0
         [int]$a = 0
         [int]$b = ($dictIndex.count)
         #
@@ -105,3 +106,4 @@ while($runCount -gt 0){
 $fullrunTimer.stop()
 Write-Host "The total time for the operation was: " $fullrunTimer.Elapsed
 $outputList | Export-Csv -Path (($indextDictonary | Split-Path -Parent) + "\" + $outputFileName)
+$randyList | Out-File -FilePath (($indextDictonary | Split-Path -Parent) + "\" + $outputFileName + ".rand")
