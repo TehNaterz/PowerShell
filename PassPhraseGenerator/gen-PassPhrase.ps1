@@ -9,7 +9,6 @@
 
 param(
     [string]$dictonaryFile="/usr/share/dict/words",
-    [string]$indextDictonary="~/.passPhraseGenerator/idxfile.xml",
     [int]$phraseLength=6
 )
 
@@ -45,23 +44,12 @@ function getaRando(){
     $fin
 }
 
-if(Test-Path $indextDictonary){
-    $dictIndex = Import-Clixml $indextDictonary
+if(!(Test-Path $dictonaryFile)){
+    throw "Cannot find Dictonary file!"
+    exit 1
 }
-else{
-    mkdir ($indextDictonary | Split-Path -Parent)
-    $dictonary = Get-Content $dictonaryFile
-    [int]$idxStart = 100000
 
-    $dictIndex = foreach($word in $dictonary){
-        New-Object -TypeName psobject -Property @{
-            index = $idxStart
-            word = $word
-        }
-    $idxStart ++
-    }
-    $dictIndex | Export-Clixml $indextDictonary
-}
+$dictIndex = Get-Content $dictonaryFile
 
 $passPhrase = $null
 $iterations = 0
@@ -70,21 +58,23 @@ While($iterations -lt $phraseLength){
     #$iterations
     $word = $null
     $randy = 999999
-    while($randy -notin ($dictIndex[-1].index)..($dictIndex[0].index)){
-        $whileRuns ++
-        $randy = getaRando
-        if($randy -gt (($dictIndex[-1].index) * 2)){
-            [int]$randy = $randy / 4
-        }
-        if($randy -gt ($dictIndex[-1].index)){
-            [int]$randy = $randy / 2
-        }
-        if($randy -lt ($dictIndex[0].index)){
-            $randy = $randy * 2
-        }
-    }
-    $passPhrase += $dictIndex[($randy - "100000")].word + " "
+    $randy = getaRando
+    $randyList += $randy
+    ####### mathTime #############################################################################################################################
+    #
+    #
+    #    thanks to Asclepius from: https://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
+    #    for this part
+    #
+    #
+    [int]$max = 999999
+    [int]$min = 0
+    [int]$a = 0
+    [int]$b = ($dictIndex.count)
+    #
+    #
+    $passPhrase += $dictIndex[[int](($b-$a)*($randy - $min)/($max - $min) + $a)] + " "
+    ##############################################################################################################################################
     $iterations ++
 }
-
 $passPhrase
