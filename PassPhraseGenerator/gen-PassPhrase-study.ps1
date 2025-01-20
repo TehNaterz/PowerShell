@@ -10,7 +10,10 @@
 param(
     [string]$dictonaryFile="/usr/share/dict/words",
     [string]$indextDictonary="~/.passPhraseGenerator/idxfile.xml",
-    [int]$phraseLength=6
+    [int]$phraseLength=6,
+    [int]$runCount="20",
+    [string]$outputFileName="IteratinTesting.csv",
+    [bool]$quickMode=$false
 )
 
 function getaRando(){
@@ -63,28 +66,42 @@ else{
     $dictIndex | Export-Clixml $indextDictonary
 }
 
-$passPhrase = $null
-$iterations = 0
-$whileRuns = 0
-While($iterations -lt $phraseLength){
-    #$iterations
-    $word = $null
-    $randy = 999999
-    while($randy -notin ($dictIndex[-1].index)..($dictIndex[0].index)){
-        $whileRuns ++
+$outputList = @()
+$fullrunTimer = [System.Diagnostics.Stopwatch]::StartNew()
+while($runCount -gt 0){
+    $timer = [System.Diagnostics.Stopwatch]::StartNew()
+    Write-Host "Run Number: $runCount"
+    $passPhrase = $null
+    $iterations = 0
+    $whileRuns = 0
+    While($iterations -lt $phraseLength){
+        #$iterations
+        $word = $null
+        $randy = 999999
         $randy = getaRando
-        if($randy -gt (($dictIndex[-1].index) * 2)){
-            [int]$randy = $randy / 4
-        }
-        if($randy -gt ($dictIndex[-1].index)){
-            [int]$randy = $randy / 2
-        }
-        if($randy -lt ($dictIndex[0].index)){
-            $randy = $randy * 2
-        }
+        ####### mathTime #############################################################################################################################
+        #
+        #
+        #    thanks to Asclepius from: https://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
+        #    for this part
+        #
+        #
+        [int]$max = 999999
+        [int]$min = 100000
+        [int]$a = 0
+        [int]$b = ($dictIndex.count)
+        #
+        #
+        $passPhrase += $dictIndex[[int](($b-$a)*($randy - $min)/($max - $min) + $a)].word + " "
+        $outputList += $dictIndex[[int](($b-$a)*($randy - $min)/($max - $min) + $a)]
+        ##############################################################################################################################################
+        $iterations ++
     }
-    $passPhrase += $dictIndex[($randy - "100000")].word + " "
-    $iterations ++
+    $timer.Stop()
+    Write-Host "The operation took: " $timer.Elapsed
+    $passPhrase
+    $runCount = $runCount - 1
 }
-
-$passPhrase
+$fullrunTimer.stop()
+Write-Host "The total time for the operation was: " $fullrunTimer.Elapsed
+$outputList | Export-Csv -Path (($indextDictonary | Split-Path -Parent) + "\" + $outputFileName)
